@@ -1,71 +1,96 @@
 
-# EX 3C Tug of War problem - Backtracking.
+# EX 3D Sudoku solver - Backtracking.
 ## DATE: 19/11/2025
 ## AIM:
-To write a Java program to for given constraints.
-Given an integer array nums, return true if you can partition the array into two subsets such that the sum of the elements in both subsets is equal or false otherwise.
-Example 1:
-Input: Enter the number of elements: 4
-Enter the elements of the array:
-1 5 11 5
-Output: true
-Explanation: The array can be partitioned as [1, 5, 5] and [11].
+To write a Java program to solve a Sudoku puzzle by filling the empty cells.
 
-Constraints:
+For example:
+<img width="357" height="322" alt="image" src="https://github.com/user-attachments/assets/334b8c39-d547-4743-aca0-de92e38bdd1c" />
 
-1 <= nums.length <= 200
-1 <= nums[i] <= 100
+
 
 ## Algorithm
 
-1. Start the program and read the number of elements `n`, then input `n` integers into the array `nums`.
-2. Calculate the total sum of all elements in the array.
-3. If the total sum is odd, print **false** (since it cannot be divided equally).
-4. Set the target as half of the total sum and create a boolean array `dp` to track possible subset sums.
-5. Use dynamic programming to fill the `dp` array and finally print **true** if a subset with the target sum exists, else **false**.
-
+1. Start the program and read a 9×9 Sudoku board input, where empty cells are represented by `0`.
+2. Define a function `isSafe()` to check if a number can be placed in a cell without violating Sudoku rules (row, column, and 3×3 box).
+3. Use the recursive function `solveSudoku()` to fill empty cells one by one using backtracking.
+4. If the number placement leads to a valid configuration, continue recursively; otherwise, backtrack by resetting the cell to `0`.
+5. After solving, print the completed Sudoku board if a solution exists; otherwise, display **"No solution exists."**
 
 ## Program:
 ```
 /*
 Developed by: Ramya.P
-Register Number: 212223240137
+Register Number:  212223240137
 */
-
 import java.util.Scanner;
-public class Solution {
-    public boolean canPartition(int[] nums) {
-        //Type your code here
-        int sum = 0;
-    for (int num : nums) sum += num;
-    if (sum % 2 != 0) return false;
-    int target = sum / 2;
-    boolean[] dp = new boolean[target + 1];
-    dp[0] = true;
-    for (int num : nums) {
-        for (int j = target; j >= num; j--) {
-            dp[j] = dp[j] || dp[j - num];
+
+public class SudokuSolver {
+
+    static boolean isSafe(int[][] board, int row, int col, int num) {
+        for (int i = 0; i < 9; i++) {
+            if (board[row][i] == num || board[i][col] == num)
+                return false;
+        }
+        int startRow = row - row % 3;
+        int startCol = col - col % 3;
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                if (board[startRow + i][startCol + j] == num)
+                    return false;
+        return true;
+    }
+
+    static boolean solveSudoku(int[][] board, int row, int col) {
+        if (row == 9)
+            return true;
+        if (col == 9)
+            return solveSudoku(board, row + 1, 0);
+        if (board[row][col] != 0)
+            return solveSudoku(board, row, col + 1);
+
+        for (int num = 1; num <= 9; num++) {
+            if (isSafe(board, row, col, num)) {
+                board[row][col] = num;
+                if (solveSudoku(board, row, col + 1))
+                    return true;
+                board[row][col] = 0;
+            }
+        }
+        return false;
+    }
+
+    static void printBoard(int[][] board) {
+        for (int[] row : board) {
+            for (int val : row)
+                System.out.print(val + " ");
+            System.out.println();
         }
     }
-    return dp[target];
-    }
+
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        Solution sol = new Solution();
-        int n = scanner.nextInt();
-        int[] nums = new int[n];
-        for (int i = 0; i < n; i++) {
-            nums[i] = scanner.nextInt();
+        Scanner sc = new Scanner(System.in);
+        int[][] board = new int[9][9];
+        for (int i = 0; i < 9; i++)
+            for (int j = 0; j < 9; j++)
+                board[i][j] = sc.nextInt();
+
+        if (solveSudoku(board, 0, 0)) {
+            System.out.println("Solved Sudoku:");
+            printBoard(board);
+        } else {
+            System.out.println("No solution exists.");
         }
-        boolean canBePartitioned = sol.canPartition(nums);
-        System.out.println(canBePartitioned);
+        sc.close();
     }
 }
 
 ```
 
 ## Output:
-<img width="426" height="180" alt="image" src="https://github.com/user-attachments/assets/eb1f083f-39ba-40bc-9d75-8acfa9a0e402" />
+
+<img width="716" height="598" alt="image" src="https://github.com/user-attachments/assets/79ac9b90-70f9-4929-b1ce-42dfa3dc36e8" />
+
 
 
 
